@@ -29,20 +29,22 @@ for f in df.index:
     df.at[f, 'length'] = signal.shape[0]/rate
 inf = NN.Informatii_Filtre()
 class_dist = df.groupby(['Class'])['length'].mean()
+df.reset_index(inplace=True)
 prob_dist = class_dist / class_dist.sum()
 
 lista = df.index
 p_path = os.path.join('..','pickles','conv.p')
-'''NN.Salvare_Modele(lista, df, inf, classes) '''    
-'''em.drow_all(classes, df,class_dist)'''
+'''NN.Salvare_Modele(lista, df, inf, classes) '''
+print(df.columns.values)    
+em.drow_all(classes, df,class_dist)
 
 handle = open(p_path,'rb')  
 model = load_model(inf.model_path)
 
-y_true ,y_pred = pr.build_prediction('../Ctest/5.wav', handle, classes, model)
+y_true ,y_pred = pr.build_prediction('../Ctest/7.wav', handle, classes, model)
 
 final = pr.raport_pred(y_pred, classes)
-em.drow_histograma(final)
+#em.drow_histograma(final)
 
 
 

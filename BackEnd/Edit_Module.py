@@ -20,8 +20,9 @@ def desen_diagrama(df,class_dist):
     ax.set_title('Distribuirea Claselor',y=1.08)
     ax.pie(class_dist, labels=class_dist.index, autopct='%1.1f%%',shadow=False,startangle=90)
     ax.axis('equal')
-    plt.show()
-    df.reset_index(inplace=True)
+    # plt.show()
+    plt.savefig(os.path.join('../Images/', 'Diagram.png'), bbox_inches='tight')
+    plt.close(fig)
     
 def desen_semnale(semnale,classes):
     figura, axe = plt.subplots(nrows=2, ncols=5, sharex=False, sharey=True, figsize=(20,5))
@@ -34,6 +35,9 @@ def desen_semnale(semnale,classes):
             axe[x,y].get_xaxis().set_visible(False)
             axe[x,y].get_yaxis().set_visible(False)
             j += 1
+    # plt.show()
+    plt.savefig(os.path.join('../Images/', 'Semnale.png'), bbox_inches='tight')
+    plt.close(figura)
 
 def desen_fft(fft,classes):
     figura, axe = plt.subplots(nrows=2, ncols=5, sharex=False, sharey=True, figsize=(20,5))
@@ -48,6 +52,9 @@ def desen_fft(fft,classes):
             axe[x,y].get_xaxis().set_visible(False)
             axe[x,y].get_yaxis().set_visible(False)
             j += 1
+    # plt.show()
+    plt.savefig(os.path.join('../Images/', 'FFT.png'), bbox_inches='tight')
+    plt.close(figura)
 
 def desen_fbank(fbank,classes):
     figura, axe = plt.subplots(nrows=2, ncols=5, sharex=False, sharey=True, figsize=(20,5))
@@ -60,6 +67,9 @@ def desen_fbank(fbank,classes):
             axe[x,y].get_xaxis().set_visible(False)
             axe[x,y].get_yaxis().set_visible(False)
             j += 1
+    # plt.show()
+    plt.savefig(os.path.join('../Images/', 'Fbank.png'), bbox_inches='tight')
+    plt.close(figura)
 
 def desen_mfccs(mfccs,classes):
     figura, axe = plt.subplots(nrows=2, ncols=5, sharex=False,sharey=True, figsize=(20,5))
@@ -72,6 +82,10 @@ def desen_mfccs(mfccs,classes):
             axe[x,y].get_xaxis().set_visible(False)
             axe[x,y].get_yaxis().set_visible(False)
             j += 1
+    # plt.show()
+    plt.savefig(os.path.join('../Images/', 'MFC.png'), bbox_inches='tight')
+    plt.close(figura)
+
 def envelope(signal , rate, threshold):
     mask = []
     signal = pd.Series(signal).apply(np.abs)
@@ -104,22 +118,22 @@ def curatare(sursa,lista,destinatie):
            wavfile.write(filename=destinatie+'/'+str(f)+'.wav',
                          rate=rate, data=signal[mask])
 
+
 def drow_all(classes,df,class_dist):
     
     signals = {}
     fft = {}
     fbank = {}
     mfccs = {}
-    
+
     for c in classes:
         wav_file=df[df.Class == c].iloc[0,0]
-        signal,rate=librosa.load('Train/'+str(wav_file)+'.wav',sr=44100)
-        mask = envelope(signal , rate , 0.0005)
+        signal,rate=librosa.load('../Train/'+str(wav_file)+'.wav',sr=44100)
+        mask = envelope(signal , rate , 0.005)
         signal = signal[mask]
         signals[c] = signal
         fft[c] = calc_fft(signal , rate)
-    
-        bank=logfbank(signal[:rate], rate , nfilt=26, nfft=1103).T
+        bank=logfbank(signal[:rate], rate , nfilt=26, nfft=1103)
         fbank[c] = bank
         mel = mfcc(signal[:rate] , rate , numcep=13, nfilt=26, nfft=1103).T
         mfccs[c] = mel
@@ -130,6 +144,7 @@ def drow_all(classes,df,class_dist):
     desen_mfccs(mfccs,len(classes))
     
 def drow_histograma(final):
+    fig = plt.figure()
     plt.bar(list(final.keys()),list(final.values()))
     plt.xlabel("Sunete")
     plt.ylabel("Probabilitate")
@@ -141,4 +156,7 @@ def drow_histograma(final):
     x= plt.xticks()[0]
     for ind, val in enumerate(list(final.values())):
         plt.text(x[ind] - 0.25, val + 0.01, str(val))
-    plt.show()
+    #plt.show()
+    plt.savefig(os.path.join('../Images/', 'Histogram.png'), bbox_inches='tight')
+    plt.close(fig)
+    
